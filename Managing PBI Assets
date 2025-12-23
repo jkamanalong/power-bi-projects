@@ -1,0 +1,102 @@
+Power BI Administration & Governance Guide
+Workspaces in Power BI Service
+  Power BI Service is a Software as a Service (SaaS) platform that organizes content into workspaces, reports, semantic models (datasets), dashboards, and apps.
+  Workspaces
+  Workspaces serve as containers for Power BI content and enable team collaboration. There are two main types:
+
+- My Workspace – personal space for individual drafting and testing.
+- Shared Workspaces – designed for team collaboration and content sharing.
+
+License Modes and Capabilities
+Different licenses unlock varying levels of features and sharing:
+    1. Pro – basic sharing and collaboration, but no advanced AI visuals or premium features.
+    2. Premium Per User (PPU) – full Premium capabilities for the licensed user, though content remains accessible only to other PPU users.
+    3. Premium Capacity – unlimited sharing within capacity limits and full feature access.
+    4. Embedded – tailored for integrating Power BI into custom applications.
+    5. Fabric Capacity – highest tier, supporting all Power BI and Microsoft Fabric features.
+ 
+Workspace Roles and Permissions
+  - Viewer – read-only access.
+  - Contributor – can create, edit, and delete content, but cannot manage workspace settings or user roles.
+  - Member – all Contributor permissions plus ability to manage workspace settings, publish/update apps, and invite users.
+  - Admin – complete control, including adding/removing members, deleting the workspace, and managing all settings.
+
+Other Key Content Types
+  - Reports – published .pbix files available within a workspace.
+  - Semantic Models (Datasets) – the underlying data sources that power published reports.
+  - Dashboards – single-page summaries built by pinning visuals (tiles) from one or more reports in the workspace.
+  - Apps – curated collections of related reports and dashboards for easy distribution to wider audiences.
+
+Managing Semantic Models
+- Power BI Gateway (for On-Premises Data)
+- The gateway acts as a secure bridge between the cloud-based Power BI Service and on-premises data sources.
+
+- Standard Mode – supports multiple users and multiple data sources (recommended for shared reports).
+- Personal Mode – limited to a single user and cannot be shared.
+- Cloud sources such as SharePoint, OneDrive, or Azure SQL do not require a gateway.
+
+Scheduled Refresh
+  To keep data up to date:
+    - Configure the gateway connection in Power BI Service.
+    - Navigate to the workspace, hover over the semantic model, and click the Schedule Refresh icon.
+    - Enable Scheduled Refresh and define the desired frequency.
+
+Incremental Refresh (for Large Datasets)
+  This feature dramatically improves refresh performance:
+    - In Power Query Editor, go to Home → Manage Parameters and create two Date/Time parameters: RangeStart and RangeEnd.
+    - Apply a filter on your date column using these parameters (e.g., Date >= RangeStart && Date < RangeEnd).
+    - Right-click the query table → Incremental Refresh → configure archive and refresh periods.
+
+Endorsement and Promotion
+  - Promotion – highlights valuable content for users.
+  - Certification – reserved for authoritative, trusted semantic models (requires admin approval).
+
+Query Caching (Performance Boost)
+  - Available for Fabric, Premium, and Embedded capacities. Enable it via workspace settings → semantic model → Query caching.
+  - Lineage and Impact Analysis
+  - Provides visibility into relationships between artifacts (requires Contributor or higher role).
+
+Semantic Model Impact Analysis – reveals which reports and dashboards would be affected by changes.
+Data Source Impact Analysis – identifies dependent semantic models.
+
+Content Distribution and Security
+  Role Permissions Recap
+    - Viewer – the only role that enforces Row-Level Security (RLS).
+    - Contributor – cannot manage workspace settings or assign roles.
+    - Member – can manage users/roles and publish apps.
+    - Admin – full administrative control.
+
+Creating and Publishing Apps
+  - In the workspace, click Create app.
+  - On the Content tab, select the reports and dashboards to include.
+  - On the Permissions tab, define the target audience (entire organization or specific users/groups).
+  - Publish or update the app.
+
+Data Alerts
+  - Available only in Power BI Service on KPI or gauge visuals. Set thresholds to receive email or mobile notifications when values cross limits.
+  - Row-Level Security (RLS)
+  - Static RLS
+  - Ideal for fixed filters (e.g., department-based):
+
+In Power BI Desktop → Modeling → Manage Roles.
+  - Create a role and add a DAX filter expression.
+  - Test using View as.
+  - Publish the report.
+  - In Power BI Service, assign users/groups to the roles.
+
+Dynamic RLS (Recommended for User-Based Filtering)
+  Creates a single flexible role:
+    - Use a filter such as [Email] = USERPRINCIPALNAME().
+    - USERPRINCIPALNAME() consistently returns the user's email address in both Desktop and Service.
+    - Avoid USERNAME() due to format differences (DOMAIN\user in Desktop vs. UPN in Service).
+
+Single Sign-On (SSO) for DirectQuery Sources
+  - On-Premises (Kerberos): In Service → Manage Gateways → edit data source → enable SSO.
+  - Cloud (Azure AD): Edit credentials → select OAuth2 → enable SSO.
+
+Object-Level Security (OLS)
+  OLS restricts access to entire tables or specific columns.
+  Configuration steps in Power BI Desktop:
+    - Enable the preview feature: File → Options and settings → Options → Preview features → Store datasets using TMDL.
+    - Open TMDL view and edit role definitions (set Table = None or Column = None).
+    - By default, all objects are accessible (Read permission). Setting an object to None hides it completely from the role.
