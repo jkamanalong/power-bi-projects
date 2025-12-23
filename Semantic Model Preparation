@@ -1,0 +1,45 @@
+Semantic Model Configuration
+* Fine tuning relationships
+    * Affects filter propagation to other tables.
+    * Model view: Manage relationship window
+    * Column to column relationship: Matching data types
+    * Understand cardinality
+    * Understand cross-filter direction. Minimize cross filters to both directions. 
+        * Only one filter propagation can be active between two tables
+        * Using USERELATIONSHIP:
+            * USERELATIONSHIP function in Power BI DAX is used when you have two or more relationships between the same tables but only one can be active at a time
+            * If you want to calculate Sales by Ship Date instead of Order Date:
+Sales by Ship Date =
+CALCULATE(
+    SUM(Sales[Amount]),
+    USERELATIONSHIP(Sales[ShipDate], 'Date'[Date])
+)
+            * Initially, it is connected to order date and we swapped ship date for it. 
+* Set table and column properties
+    * Go into model view and open properties pane
+        * Renaming
+        * Adding descriptions
+        * Mark date tables
+        * Hide key columns
+        * Update category
+        * Set summarization
+        * Configure hierarchies
+        * Add measures
+        * Set parameters
+            * Numeric range parameter: 
+                * Setup min, max, increment, default values. 
+                * Creates a disconnected table
+                * Use parameter in measures: 
+                    * Sales with Growth =
+                    * [Total Sales] * (1 + 'Growth Rate Parameter'[Growth Rate Parameter Value])
+            * Fields parameter:
+                * Could be columns (Category, Region, Year) or measures (Sales, Profit, Quantity)
+                * Drop field paramter in x-axis or y-axis, legend, or values of a report. 
+                * Examples: 
+                    * Dimension selector: Region, Category, Segment to an axis of a chart
+                    * Measure selector: Place in values
+                    * Can also combine both by creating dimension and measure fields parameter. 
+* Create other model objects
+    * Hierarchies
+    * Measures
+    * Parameters
