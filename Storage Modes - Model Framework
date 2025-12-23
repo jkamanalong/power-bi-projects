@@ -1,0 +1,76 @@
+Getting data from NoSQL database:
+- Get Data > More > Azure > Azure Cosmos DB > Connect > Enter database credentials
+
+Getting data from online services: Sharepoint, OneDrive, Dynamic 365, Google Analytics
+- Get Data > Online Services > Sharepoint online list
+- Click connect > Supply the sharepoint url from the site
+- Delete the last parts of your url to make sure you see all lists available
+- Click ok after, and sign in with your account
+- Select list you want to load
+
+Storage modes:
+1. Import - Creates a local copy of data for power BI. Can use all power BI service features when using this mode
+2. directQuery - Directly connected to the source. Used for large semantic models. 
+3. Dual (Composite) - Mix
+
+Fix performance issues
+* SQL Server fine tuning techniques
+    * Index creation
+    * Hardware upgrades
+    * Execution plan tuning
+    * Data compression
+* Query Folding
+    * Transformation and edits are done in the SQL query select statements
+    * Also, by using power query editor when loading data
+    * Compatible with DirectQuery and Dual storage modes. 
+* Query diagnostics
+    * Tools > Start diagnostics > Stop when finished
+* Separate date/time
+
+Data import errors
+* Query timeout expired: When pulling too much data according to the organization’s policies
+* We couldn't find any data formatted as a table
+    * Open excel file and ctrl+T
+* Couldn’t find file: Update the source location
+* Data type errors:
+    * Double check data type from source
+
+Power Query Editor doable actions: 
+* Renaming - columns and tables
+* Changing data types
+* Removing rows/columns
+* Merging and appending tables  
+* Profiling dataset
+    * View > column distribution, column quality, and column profile
+    * Column Distribution - spread of data showing frequency
+    * Column Quality - counts of valid, error, and empty/null
+    * Column Profile - stat data
+    * View > Advanced editor for editing M queries
+* Setting first row as headers /more…
+
+Model framework
+* Star schema: 
+    * Dimension tables
+    * Fact table
+* Import model
+* Includes calculated tables defined in DAX formulas. Stored entirely in memory
+    * 1-GB limit per dataset
+    * Data reduction strategies:
+        * Remove columns/rows, 
+        * Group by and summarize, increase grain of fact tables
+        * Disable auto date/time
+    * Refresh - max of 48 times per day
+* DirectQuery Model
+    * Can enforce RLS
+    * Supports RDBMS. Can connect to a remote model and convert it to local model. Technique is chaining models. 
+        * Can extend the model with calculated columns/tables, or add new import or directquery tables. 
+        * Extension results to creation of new source groups. The extended model becomes a composite model. 
+    * Limitations:
+        * Not all data sources are supported. 
+        * All Power Query (M) transformations are not possible (pivot and unpivoting is not possible).   
+    * How to optimize?
+        * Add user-defined aggregation tables hidden from users, calculations, and RLS. 
+* Dual (Composite) Model: 
+    * Known as a limited relationship
+    * Boosting performance?
+        * Import aggregation tables
