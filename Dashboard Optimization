@@ -1,0 +1,39 @@
+Optimization
+* Techniques:
+    * Data types must be correct/uniform
+    * Remove unnecessary rows/columns
+    * Avoid repeating values
+    * Surface numeric columns as measures
+    * Reduce column cardinality
+    * Analyze model metadata
+    * Summarize data where possible
+* Analyze performance:
+    * Clearing data cache:
+        * Restart power BI desktop
+        * Create a new page
+        * Connect to DAX Studio and invoke clear cache function in the advanced tab
+    * View > Performance analyzer
+        * Start recording
+        * Select page of report to analyze
+        * Interact with the elements inside that page
+        * Stop recording and then analyze results
+    * Results anatomy:
+        * DAX Query - Querying data time
+        * Visual Display - Rendering time
+        * Other - DAX queries / No. of visuals in the report
+    * Resolving Techniques: 
+        * Visuals - Adding tooltips / Drill-through pages
+        * DAX Query - Filter vs Keepfilter. Filter(‘Table’, ‘Table[column] = “value”)
+        * Semantic model - Disable auto date/time option. 
+            * Relationships - Ensure correct relationships
+            * Columns - Remove at the source. Avoid deletion at power query editor. 
+            * Auto-date/time: File>Options and settings > Options > Data load > Time intelligence
+        * Use variables in measures that are complicated
+        * Reduce cardinality
+        * Optimize directQuery models with table level storage. 
+        * Create aggregations: Import or create a new table
+            * Load as import mode
+            * Define relationships with dimension tables
+            * Keys in aggregation table should align with the detail table’s dimension keys
+            * Mark the table as aggregation table
+            * Choose an aggregation function for each column after mapping them to the detail table. 
