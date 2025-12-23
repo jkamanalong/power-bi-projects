@@ -77,3 +77,18 @@
     Month Order = YEAR(Date[Date])*100 + MONTH(Date[Date])
     Use the calculated column for fixing the order of your categorical axis. 
 
+4. Weekly categorical labeling
+
+    Week_Category = 
+    VAR Weekpart = WEEKNUM('Date_Start-date'[Date],1)-WEEKNUM(DATE(YEAR('Date_Start-date'[Date]),MONTH('Date_Start-date'[Date]),1),1)
+    VAR Monthpart = FORMAT('Date_Start-date'[Date],"MMMM")
+    VAR Yearpart = YEAR('Date_Start-date'[Date])
+    RETURN
+    SWITCH(
+        Weekpart,
+        1, Weekpart & "st Week",
+        2, Weekpart & "nd Week",
+        3, Weekpart & "rd Week",
+        4, Weekpart & "th Week"
+    )
+ 
