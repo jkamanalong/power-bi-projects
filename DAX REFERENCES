@@ -1,0 +1,109 @@
+* Calculation types:
+    * Calculated tables: 
+        * Can duplicate existing model data - Ship Date = ‘Date’
+        * Always imported and increases the model storage size, which extends data refresh time. 
+        * Commonly used for: 
+            * Date tables - CALENDAR / CALENDARAUTO
+                * Due Date = CALENDARAUTO(6) #From early to latest month June
+            * Role-Playing dimensions - Example, ship and order date is split into two tables
+            * What-if analysis - Parameters
+    * Calculated columns: 
+        * Evaluated for each row of the table (Row Context)
+        * Evaluated when semantic model is refreshed, and it increases the storage size of the model. 
+    * Measures: 
+        * Returns a single value
+        * Evaluated every query time 
+        * 2 types:
+            * Explicit measures - written in DAX
+            * Implicit measures - sum, count, minimum, maximum,
+    * Row level security (RLS)
+        * Expressions that enforce filters over model tables
+
+Anatomy of DAX formulas:
+* DAX functions - fn()
+    * Iterator functions: SUMX, COUNTX, MINX, MAXX, others… Evaluates an expression for each row (Applies row context). Useful for scenarios wherein you don’t want to create a calculated column for a specific expression (calculation) that you want per row. 
+    * RANKX - Default is descending order. Use DENSE to continue ranking with tie numbers. RANKX(Table,Column,,DENSE)
+    * Time intelligence functions:
+        * DATESYTD, DATESMTD, DATESQTD - Can be passed as filter inside CALCULATE function. 
+            * Ex 1. Sales YTD = CALCULATE(SUM(Sales[SalesAmt]),DATESYTD(‘Date’[Date]))
+            * Ex 2. Starts in April…  Sales YTD (Fiscal) = CALCULATE(SUM(Sales[SalesAmt]),DATESYTD(‘Date’[Date], “3/31”))
+        * TOTALYTD, TOTALMTD, TOTALQTD - A shortcut version of CALCULATE with DATESYTD inside. 
+            * TOTALYTD(expression, dates, filter, year end date)
+            * Sales YTD = TOTALYTD(SUM(Sales[SalesAmt]),’Date’[Date])
+        * DATESBETWEEN - Returns a table that contains a column of dates that begins with a given start date and continues until a given end date. 
+            * DATESBETWEEN(Date, DATE(start), DATE(end))
+        * DATESINPERIOD - Returns a table that contains a column of dates that begins with a given start date and continues for the specified number of intervals. 
+            * DATESINPERIOD(Date, DATE(start), no. of interval, interval type)
+        * FIRSTDATE/LASTDATE
+            * First_Sale_Date =
+            * CALCULATE ( FIRSTDATE ( 'Date'[Date] ), ALL ( Sales ) )
+            * 
+            * Last_Sale_Date =
+            * CALCULATE ( LASTDATE ( 'Date'[Date] ), ALL ( Sales ) )
+        * Count new occurrences: Running total of distinct internet customers over time
+            * Customers LTD =  VAR CustomersLTD =  CALCULATE( DISTINCTCOUNT(‘Sales’[CustomerKey], DATESBETWEEN( ‘Date’[Date], BLANK(), MAX(‘Date’[Date]) ), ‘Sales Order’[Channel] = “Internet” ) RETURN CustomersLTD
+            * New employees =  CALCULATE( DISTINCTCOUNT(Employees[EmployeeID], FILTER( Employees, Employees[HireDate] >= MIN(‘Date’[Date]) && Employees[HireDate] <= MAX(‘Date’[Date]) )
+            * Leavers =  CALCULATE( DISTINCTCOUNT(Employees[EmployeeID], FILTER( Employees, NOT ISBLANK(Employees[TerminationDate])&& Employees[TerminationDate] >= MIN(‘Date’[Date]) && Employees[TerminatinoDate] <= MAX(‘Date’[Date]) )
+            * New Customers =  		VAR CustomersLTD =
+		    CALCULATE(
+		        DISTINCTCOUNT(Sales[CustomerKey]),
+		        DATESBETWEEN(
+		            'Date'[Date],
+		            BLANK(),
+		            MAX('Date'[Date])
+		        ),
+		    'Sales Order'[Channel] = "Internet"
+		    )
+		VAR CustomersPrior =
+		    CALCULATE(
+		        DISTINCTCOUNT(Sales[CustomerKey]),
+		        DATESBETWEEN(
+		            'Date'[Date],
+		            BLANK(),
+		            MIN('Date'[Date]) - 1
+		        ),
+		        'Sales Order'[Channel] = "Internet"
+		    )
+		RETURN
+		    CustomersLTD - CustomersPrior
+            * LASTDATE - 
+            * LASTNONBLANK
+                * Last_Sales_Date =
+                * LASTNONBLANK ( 'Date'[Date], SUM ( Sales[Amount] ) )
+        * Comparisons over time:
+            * DATEADD - Returns a table that contains a column of dates, shifted either forward or backward in time by the specified number of intervals from the dates in the current filter context. (date table, no. of interval, interval type)
+            * PARALLELPERIOD - Returns a table that contains a column of dates that represents a period that is parallel to the dates in the specified dates column, in the current filter context, with the dates shifted a number of intervals either forward in time or back in time.
+            * SAMEPERIODLASTYEAR - Returns a table that contains a column of dates that are shifted one year back in time from the dates in the specified dates column, in the current filter context.
+            * Many helper DAX functions for navigating backward or forward for specific time periods, all of which returns a table of dates. These helper functions include NEXTDAY, NEXTMONTH, NEXTQUARTER, NEXTYEAR, and PREVIOUSDAY, PREVIOUSMONTH, PREVIOUSQUARTER, and PREVIOUSYEAR.
+            * 
+* DAX operators - performs arithmetic calculations
+    * Arithmetic [ + , - , * , / , ^ ]
+    * Comparison [ = , == , > , < , >= , <= , <> ]
+    * Text concatenation - ‘&’
+    * Logical operators - 
+        * && - AND
+        * || - OR
+        * IN - IN {‘TableName’[ColumnName]}
+        * NOT - 
+* references to model objects
+    * Refers to the following model objects
+        * Tables - ‘TableName’
+        * Columns - [ColumnName]
+        * Measures - [MeasureName]
+    * Can’t refer to a hierarchy or a hierarchy level
+* constants
+* DAX variables
+* Whitespaces - spaces, tabs, and carriage returns
+
+Formulas to look out for:
+* YoY % = 100*(Revenue current period - Revenue previous period) / Revenue previous period
+    * ￼
+* Using VAR to streamline the writing of formulas
+    * ￼
+* MonthKey - Used for organizing months in a data table
+    * MonthKey = (YEAR(‘Date’[Date])*100) + MONTH(‘Date’[Date])
+* RELATED or RELATEDTABLE - Gets value from one-one side relationship, gets a table of values from the many-side.
+* LOOKUPVALUE - Used when there’s no relationship between tables
+    * ￼
+* Using VALUES to get a unique list of sales order numbers
+    * ￼
