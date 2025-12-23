@@ -1,0 +1,88 @@
+Part 1: Single-Value Dynamic Reports (Using Parameters in SQL Queries)
+        This method injects a parameter into a native SQL query via string concatenation (&) in Power Query.
+        
+        Create your base SQL query
+        Connect to your data source → Enter a SQL statement (native query).
+        Example:
+        SELECT * FROM Sales WHERE Region = 'North'
+
+Part 2: Transform data and create the parameter source
+        Close & Apply → Go to Transform Data (Power Query Editor).
+        Select a column with possible filter values (e.g., Region) → Right-click → Drill Down or Add as New Query to isolate unique values.
+        Remove duplicates → Rename this query (e.g., "RegionList").
+
+Part 3: Create the Parameter
+        Home tab → Manage Parameters → New Parameter.
+        Type: Text (or match your data type).
+        Suggested Values: Query → Select your list query (RegionList).
+        Current Value: Pick a default.
+        Name it (e.g., "ParamRegion").
+
+Part 4: Inject the Parameter into the SQL Query
+        Edit your main SQL query → Go to Advanced Editor.
+        Concatenate the parameter:
+        let
+            Source = Sql.Database("server", "database", [Query="SELECT * FROM Sales WHERE Region = '" & ParamRegion & "'"])
+        in
+            Source
+        For numbers: No quotes needed (e.g., ... WHERE Year = " & Number.ToText(ParamYear) & "").
+        Important: Always validate/sanitize inputs to prevent SQL injection (parameters are safer than direct user input).
+
+Part 5: Apply the Parameter in the Report
+        Close & Apply.
+        To change values: Transform Data → Edit Parameters → Enter new value → OK → Apply changes.
+        For user-friendly selection: Use a What-If Parameter (Modeling tab) or slicer bound to the list.
+
+
+Best Practice Notes:
+
+This pushes filtering to the source (great for performance).
+Alternative (preferred for DirectQuery): Use Dynamic M Query Parameters (bind a field to the parameter via slicer).
+Avoid if possible in published reports—parameters don't update dynamically in the Service without re-publish (use gateways + scheduled refresh for Excel-driven params).
+
+
+
+Part 2: Multi-Value Dynamic Reports (Using List from Excel + Custom Function)
+This is useful for processing multiple items (e.g., looping over IDs to fetch/union data, or filtering on IN clause).
+
+Part 1: Import the List (e.g., from Excel)
+        Get Data → Excel → Select sheet with your list (e.g., column of IDs/Regions).
+        Name this query "ValueList". Remove duplicates if needed. Match the data type to the parameter type when creating the parameter
+
+Part 2: Create a Sample Query
+        Duplicate your main query or create a new one that filters for ONE value (hardcoded).
+        Name it "SampleQuery".
+        *Important Note: Query properties section: Change name of the data source to be similar with the column name of the excel sheet
+
+Part 3: Turn it into a Custom Function
+        Right-click "SampleQuery" → Create Function.
+        Power BI auto-detects the parameter (e.g., from the hardcoded value).
+        Name the function (e.g., "fnGetData").
+        Parameter type should match your list (e.g., Text).
+
+Part 4: Invoke the Function on the List
+        Go to "ValueList" query.
+        Add Column → Invoke Custom Function.
+        Select your function → Choose the column with values as the argument.
+        This creates a new column with tables (one per row).
+
+Part 5: Expand and Combine Results
+        Click the expand icon on the new column → Select needed columns → OK.
+        This appends/unions all results into one table.
+
+
+Example Use Case: If your SQL supports IN, build the clause dynamically in the function (e.g., Text.Combine list with commas).
+Best Practice Notes:
+
+Great for combining multiple similar queries (e.g., multiple files, APIs).
+For simple multi-select filtering: Prefer Field Parameters or Dynamic M Parameters with multi-select slicers.
+Performance: Expanding large lists can be slow—filter early.
+
+Overall Recommendations
+
+Prefer modern features: Dynamic M parameters (2021+), Field Parameters (for switching fields), What-If parameters (for user inputs).
+Security: Never concatenate untrusted input into SQL.
+Testing: Always preview queries after parameter changes.
+Alternatives for Multi-Value:
+Excel-driven: Load list as table → Use in filters (but refresh needed).
+Slicers + measures for dynamic calc.
