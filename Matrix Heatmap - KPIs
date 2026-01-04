@@ -4,10 +4,6 @@ Step 1: Create the Column Header Table (Disconnected)
 This table defines your matrix columns and their display order.
 
 Heatmap_Col = 
-/*
-Columns for the KPI Heatmap on "Client Heatmap - All" page
-Order column ensures correct left-to-right sorting
-*/
 DATATABLE(
     "Category", STRING,
     "Order", INTEGER,
@@ -37,10 +33,6 @@ Step 2: Create the Row Header Table (Disconnected)
 This provides the KPI row identifiers.
 
 Heatmap_KPI = 
-/*
-Row headers for the KPI Heatmap
-Contains KPI # (1 to 34) – adjust range as needed
-*/
 DATATABLE(
     "KPI #", INTEGER,
     {
@@ -55,10 +47,6 @@ Step 3: Create the Dynamic Value Measure
 This single measure powers all cells in the matrix.
 
 HM_Val = 
-/*
-Dynamic values for the KPI Heatmap matrix
-Returns text for headers, numeric values for months
-*/
 VAR CurrentKPI = SELECTEDVALUE('Heatmap_KPI'[KPI #])
 VAR SelectedCol = SELECTEDVALUE('Heatmap_Col'[Category])
 VAR IsMonthCol = SelectedCol IN {"M1","M2","M3","M4","M5","M6","M7","M8","M9","M10","M11","M12"}
